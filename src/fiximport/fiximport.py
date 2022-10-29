@@ -49,6 +49,8 @@ def find_project_root(file_path: Path) -> Path:
 def add_python_dirs_to_syspath(root: Path) -> None:
     assert root.is_dir()
 
+    sys.path.insert(0, str(root.parent))
+
     visited_set = set()
     sys_path_set = set(sys.path)  # Set for fast lookups.
     add_python_dir_to_syspath(root, sys_path_set, visited_set)
