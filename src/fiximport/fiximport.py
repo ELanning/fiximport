@@ -11,7 +11,10 @@ def get_importer_path() -> Optional[Path]:
         is_package_init = (
             frame.code_context is not None
             and len(frame.code_context) != 0
-            and frame.code_context[0] == "from .fiximport import *\n"
+            and (
+                frame.code_context[0] == "from .fiximport import *\n"
+                or "importer_path = get_importer_path()\n" in frame.code_context[0]
+            )
         )
         if not is_internal_library and not is_package_init:
             return Path(frame.filename)
