@@ -55,7 +55,7 @@ def add_python_dirs_to_syspath(root: Path) -> None:
     visited_set = set()
     sys_path_set = set(sys.path)  # Set for fast lookups.
 
-    # Explicitly add the project root parent.
+    # Explicitly add the project root's parent.
     # This allows imports such as `import coolproject.helper` vs `import helper`.
     parent_str = str(root.parent)
     if parent_str not in sys_path_set:
