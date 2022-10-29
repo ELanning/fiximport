@@ -50,12 +50,25 @@ def find_project_root(file_path: Path) -> Path:
 
 
 def add_python_dirs_to_syspath(root: Path) -> None:
-    assert root.is_dir()
-
-    sys.path.insert(0, str(root.parent))
+    assert root.is_dir() and root.is_absolute()
 
     visited_set = set()
     sys_path_set = set(sys.path)  # Set for fast lookups.
+
+    # Explicitly add the project root parent.
+    # This allows imports such as `import coolproject.helper` vs `import helper`.
+    parent_str = str(root.parent)
+    if parent_str not in sys_path_set:
+        sys.path.insert(0, parent_str)
+        sys_path_set.add(parent_str)
+
+    # Explicitly add the project root.
+    # On some installations of the python interpreter, this has been necessary.
+    root_str = str(root)
+    if root_str not in sys_path_set:
+        sys.path.insert(0, root_str)
+        sys_path_set.add(root_str)
+
     add_python_dir_to_syspath(root, sys_path_set, visited_set)
 
 
@@ -64,7 +77,7 @@ def add_python_dir_to_syspath(root: Path, sys_path_set: set, visited_set: set) -
     Returns whether the given `root` is likely a python module.
     It is added to the sys.path if it is.
     """
-    assert root.is_dir()
+    assert root.is_dir() and root.is_absolute()
 
     root_str = str(root)
     visited_set.add(root_str)
@@ -85,7 +98,11 @@ def add_python_dir_to_syspath(root: Path, sys_path_set: set, visited_set: set) -
                 is_python_module = True
 
         # Likely a module if the current directory contains python files. Add current directory to sys.path.
-        if item.suffix in typical_python_extensions and root_str not in sys_path_set:
+        if (
+            item.is_file()
+            and item.suffix in typical_python_extensions
+            and root_str not in sys_path_set
+        ):
             sys.path.insert(0, root_str)
             sys_path_set.add(root_str)
             is_python_module = True
