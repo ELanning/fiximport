@@ -36,6 +36,9 @@ def find_project_root(file_path: Path) -> Path:
                 return True
         return False
 
+    if not file_path.is_absolute():
+        file_path = file_path.resolve()
+
     # For example, 'c:/foo/bar/setup.py' has 3 parents, 'c:/foo/bar', 'c:/foo', and 'c:/'
     parents = file_path.parents
     for parent in parents:
